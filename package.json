@@ -1,0 +1,18 @@
+{
+  "name": "cryptoinfo-telegram-bot",
+  "description": "A Telegram Bot that retrieves CryptoChoe tweets about crupto currency and trades info. https://t.me/cryptoinfotelegrambot",
+  "version": "1.0.0",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bot.js"
+  },
+  "repository": "https://github.com/sergebruni/cryptoinfo-telegram-bot.git",
+  "author": "Sergio Bruni <sergebruni@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "node-telegram-bot-api": "^0.30.0",
+    "twitter": "^1.7.1"
+  }
+}
