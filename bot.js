@@ -5,10 +5,10 @@ const _           = require('lodash');
 const jsonFile    = require('jsonfile');
 
 // Load config file
-var config   = require(__dirname + "/config.json");
+let config   = require("./config.json");
 
 // Create Twitter API REST Client
-var client = new Twitter(config.twitter); 
+let client = new Twitter(config.twitter); 
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(config.telegram.token, {polling: true});
@@ -27,7 +27,7 @@ bot.on('message', (msg) => {
   // Last Tweet action
   if (msg.text.indexOf("Last Tweet") === 0) {
     if (_.isUndefined(config.app.lastTweet)) {
-      var text  = config.app.lastTweet.text + '\n';
+      let text  = config.app.lastTweet.text + '\n';
           text += 'at '+ config.app.lastTweet.created_at + '\n';
       bot.sendMessage(msg.chat.id, text);
     }
@@ -38,14 +38,14 @@ bot.on('message', (msg) => {
 
 function getTweets(chatId = undefined) {
   
-  var params = { screen_name: 'cryptochoe', exclude_replies: true };
+  let params = { screen_name: 'cryptochoe', exclude_replies: true };
 
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error) {
 
       tweets = _.orderBy(tweets, ['id_str'], ['asc'])
 
-      var text  = tweets[tweets.length - 1].text + '\n';
+      let text  = tweets[tweets.length - 1].text + '\n';
           text += 'at '+ tweets[tweets.length - 1].created_at + '\n';
 
       bot.sendMessage(chatId, text);
