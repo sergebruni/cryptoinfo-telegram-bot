@@ -12,6 +12,8 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "jsonfile": "^4.0.0",
+    "lodash": "^4.17.4",
     "node-telegram-bot-api": "^0.30.0",
     "twitter": "^1.7.1"
   }
