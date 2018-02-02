@@ -15,6 +15,10 @@ Create config.json file with these fields:
 
 ```
 {
+  "app": {
+    "lastTweet": {},
+    "since_id": 0
+  },
   "telegram":{
     "token":""
   },
