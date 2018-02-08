@@ -14,6 +14,9 @@ const client = new Twitter(config.twitter);
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(config.telegram.token, {polling: true});
 
+// Create botan.io client for bot statistics tracking
+const Botan = require('botanio')(config.botan.token);
+
 // Listen for command messages.
 bot.on('message', (msg) => { 
   // Last Tweet action
@@ -25,6 +28,7 @@ bot.on('message', (msg) => {
       bot.sendMessage(msg.chat.id, "Welcome, type /help for a command list");
       registerChat(msg.chat.id)
       sendTweet(msg.chat.id)
+      Botan.track(msg, 'start')
       break;
     case '/help':
     case '/help@cryptoinfotelegrambot':
@@ -32,10 +36,12 @@ bot.on('message', (msg) => {
       /help - Show bot help info
       /lasttweet - Send Last Tweet`;
       bot.sendMessage(msg.chat.id, text);
+      Botan.track(msg, 'help')
       break;
     case '/lasttweet':
     case '/lasttweet@cryptoinfotelegrambot':
       sendTweet(msg.chat.id)
+      Botan.track(msg, 'lasttweet')
       break;
   }
 });
