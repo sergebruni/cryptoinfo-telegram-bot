@@ -9,7 +9,7 @@ const CronJob     = require('cron').CronJob;
 const config      = require("./config.json");
 
 // Create Twitter API REST Client
-const client = new Twitter(config.twitter); 
+const client = new Twitter(config.twitter);  
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(config.telegram.token, {polling: true});
@@ -47,30 +47,38 @@ const sendTweet = (chatId) => {
     at ${config.app.lastTweet.created_at}`;
     bot.sendMessage(chatId, text);
   }
-  else
-    getTweets(chatId)
+  else {
+    getTweets().then((res) => sendTweet(chatId)).catch((err) => console.log(err))
+  }  
 }
 
-// Get tweet function through Twitter API
-const getTweets = (chatId) => {  
-  const params = { screen_name: 'cryptochoe', exclude_replies: true };
+// Get tweet promise through Twitter API
+const getTweets = () => new Promise(
+  function (resolve, reject) {
+    const params = { screen_name: 'cryptochoe', exclude_replies: true };
 
-  client.get('statuses/user_timeline', params, function(error, tweets, response) {
-    if (error) return console.log(error)
+    client.get('statuses/user_timeline', params, (error, tweets, response) => {
+      if (error) return reject(error)
 
-    tweets = _.orderBy(tweets, ['id_str'], ['asc'])
-    
-    if (config.app.since_id >= tweets[tweets.length - 1].id) return console.log('nothing to update')
+      tweets = _.orderBy(tweets, ['id_str'], ['asc'])
       
-    config.app.lastTweet = tweets[tweets.length - 1];
-    config.app.since_id = config.app.lastTweet.id;
+      if (config.app.since_id >= tweets[tweets.length - 1].id) 
+        return reject({
+          curr_id: tweets[tweets.length - 1].id,
+          last_id: config.app.since_id,
+          message: 'nothing to update'
+        })
+        
+      config.app.lastTweet = tweets[tweets.length - 1];
+      config.app.since_id = config.app.lastTweet.id;
 
-    saveConfigFile(); 
-    sendTweet(chatId);              
+      saveConfigFile()
+      return resolve({success: true, message: 'feed updated'})
+    });
+  }
+);
 
-  });
-}
-
+// Register chat id function
 const registerChat = (chatId) => {
   if (_.indexOf(config.app.chatIdArr, chatId) !== -1){ return }  
   config.app.chatIdArr.push(chatId);
@@ -80,15 +88,19 @@ const registerChat = (chatId) => {
 // Cron job to stay updated to Tweets
 const job = new CronJob({
   cronTime: "*/5 * * * *",
-  onTick: function() {
-    console.log('cron job runing')
-    _.forEach(config.app.chatIdArr, (chatId, key) => {
-      getTweets(chatId);
-    });    
+  onTick: async function () {
+    try {
+      const res = await getTweets()
+      config.app.chatIdArr.forEach(sendTweet)      
+    } 
+    catch (err) { console.error(err) }      
   },
   runOnInit: true,
   timeZone: 'America/Caracas'
 });
+
+// Start Cron job
+job.start();
 
 // Save new config file values
 const saveConfigFile = () => {
