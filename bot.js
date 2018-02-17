@@ -3,14 +3,13 @@ const Twitter     = require('twitter')
 
 const _           = require('lodash')
 const jsonFile    = require('jsonfile')
-const requireDir  = require("require-directory");
 const CronJob     = require('cron').CronJob
 
 // Load config file
 const config      = require('./config.json')
 
 // Load commands
-var commands = require('./src/commands/index')
+const commands = require('./src/commands/index')
 
 // Create Twitter API REST Client
 const twitter = new Twitter(config.twitter);
