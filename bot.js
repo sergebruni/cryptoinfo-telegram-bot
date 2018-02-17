@@ -33,7 +33,7 @@ bot.on('message', (msg) => {
       handleStart(msg.chat.id)
       break;    
     case '/stop':
-    case '/start@cryptoinfotelegrambot':
+    case '/stop@cryptoinfotelegrambot':
       handleStop(msg.chat.id)
       break;   
     case '/lasttweet':
@@ -180,6 +180,7 @@ const handlePriceCheck = (chatId, params) => {
     
     bot.sendMessage(chatId, `${params[0]}: ${obj.data.amount} ${params[1]}`)  
   });
+  Botan.track(msg, 'pricecheck')
 }
 // Developer command handler
 const handleDeveloper = (chatId) => {
