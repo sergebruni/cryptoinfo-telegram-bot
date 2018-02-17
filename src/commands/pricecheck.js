@@ -19,11 +19,11 @@ class PriceCheck extends Command {
   run(bot, chat, params) {
 
     coinbase.getBuyPrice({'currencyPair': `${params[0]}-${params[1]}`}, (err, obj) => {
-      if (err) return bot.sendMessage(chatId, `Can't process your request`)
+      if (err) return bot.sendMessage(chat, `Can't process your request`)
       
       return bot.sendMessage(chat, `${params[0]}: ${obj.data.amount} ${params[1]}`)  
     });
-    
+
   }
 }
 
