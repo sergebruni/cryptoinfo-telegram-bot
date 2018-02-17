@@ -23,6 +23,11 @@ Create config.json file with these fields:
   "telegram":{
     "token":""
   },
+  "botan":{"token":""},
+  "coinbase":{
+    "apiKey":"",
+    "apiSecret":""
+  },
   "twitter":{
     "consumer_key":"",
     "consumer_secret":"",

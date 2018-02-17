@@ -1,19 +1,19 @@
-const TelegramBot = require('node-telegram-bot-api');
-const Twitter     = require('twitter');
-const CoinBase     = require('coinbase').Client;
+const TelegramBot = require('node-telegram-bot-api')
+const Twitter     = require('twitter')
 
-const _           = require('lodash');
-const jsonFile    = require('jsonfile');
-const CronJob     = require('cron').CronJob;
+const _           = require('lodash')
+const jsonFile    = require('jsonfile')
+const requireDir  = require("require-directory");
+const CronJob     = require('cron').CronJob
 
 // Load config file
-const config      = require("./config.json");
+const config      = require('./config.json')
+
+// Load commands
+var commands = require('./src/commands/index')
 
 // Create Twitter API REST Client
 const twitter = new Twitter(config.twitter);
-
-// Create Twitter API REST Client
-const coinbase = new CoinBase(config.coinbase);
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(config.telegram.token, {polling: true});
@@ -42,15 +42,18 @@ bot.on('message', (msg) => {
       break;
     case '/pricecheck':
     case '/pricecheck@cryptoinfotelegrambot':
-      handlePriceCheck(msg.chat.id, args)
+      commands['pricecheck'].run(bot, msg.chat.id, args)
+      Botan.track(msg, 'pricecheck')
       break;
     case '/help':
     case '/help@cryptoinfotelegrambot':
-      handleHelp(msg.chat.id)
+      commands['help'].run(bot, msg.chat.id)
+      Botan.track(msg, 'help')
       break;
     case '/developer':
     case '/developer@cryptoinfotelegrambot':
-      handleDeveloper(msg.chat.id)
+      commands['developer'].run(bot, msg.chat.id)
+      Botan.track(msg, 'developer')
       break;
     default:
       bot.sendMessage(msg.chat.id, `command not recognized, type /help for a list of commands`);
@@ -154,40 +157,8 @@ const handleStop = (chatId) => {
 
   Botan.track(msg, 'stop')
 }
-// Help command handler
-const handleHelp = (chatId) => {
-  const text = `/start - Start bot, register to the feed recipient list
-  /stop - Unregister from the feed recipient list
-  /lasttweet - Send Last Tweet
-  /pricecheck - Check currency price | usage: /pricecheck <currency> <format> | example: /pricecheck btc usd
-  /help - Show bot help info
-  /developer - Show developer info`;
-
-  bot.sendMessage(chatId, text);
-  
-  Botan.track(msg, 'help')
-}
 // Last Tweet command handler
 const handleLastTweet = (chatId) => {
   sendTweet(chatId)
   Botan.track(msg, 'lasttweet')
 }
-// Price Check command handler
-const handlePriceCheck = (chatId, params) => {
-  console.log(params)
-  coinbase.getBuyPrice({'currencyPair': `${params[0]}-${params[1]}`}, (err, obj) => {
-    if (err) return bot.sendMessage(chatId, `Can't process your request`)
-    
-    bot.sendMessage(chatId, `${params[0]}: ${obj.data.amount} ${params[1]}`)  
-  });
-  Botan.track(msg, 'pricecheck')
-}
-// Developer command handler
-const handleDeveloper = (chatId) => {
-  const text = `Developed by @sergsss.
-  GitHub repo: https://github.com/sergebruni/cryptoinfo-telegram-bot`
-  bot.sendMessage(chatId, text);
-  
-  Botan.track(msg, 'developer')
-}
-  
