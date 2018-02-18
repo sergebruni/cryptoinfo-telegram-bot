@@ -1,3 +1,5 @@
 /node_modules
 
 config.json
+
+/src/twitterService/tweet.json
